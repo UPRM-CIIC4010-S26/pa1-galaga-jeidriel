@@ -20,6 +20,11 @@ class Program {
         int lives = 3;
         int pauseFrames = 0;
 
+        int score = 0;
+        int nextLifeScore = 1000;
+        
+        void CheckExtraLives();
+
         bool startup = true;
         bool paused = false;
         bool gameOver = false;

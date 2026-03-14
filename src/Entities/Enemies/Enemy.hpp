@@ -13,6 +13,7 @@ class Enemy {
         bool spawning = false;
         bool frame = false;
         int frameCooldown = 30;
+        int scoreValue = 0;
         
     public:
         int health = 1;
@@ -35,6 +36,8 @@ class Enemy {
         virtual void update(std::pair<float, float> pos, HitBox target) = 0;
         virtual void attack(HitBox target) = 0;
 
+        int getScoreValue() const { return scoreValue; }
+
         void frameChange() {
             frameCooldown--;
 
@@ -44,40 +47,60 @@ class Enemy {
              }
         }
 
-        static void ManageEnemies(HitBox target) {
-            for (std::pair<std::pair<float, float>, Enemy*>& p : Enemy::enemies) {
-                p.first.first += (p.first.first == 0) ? 0 : direction;
-                if (p.second) {
-                    p.second->update(p.first, target);
+      static int ManageEnemies(HitBox target) {
+    int gainedScore = 0;
 
-                    for (Projectile& p2 : Projectile::projectiles) {
-                        if (p2.ID != 1 && HitBox::Collision(p.second->hitBox, p2.getHitBox())) {
-                            p.second->health--;
-                            p2.del = true;
-                        }
+    for (std::pair<std::pair<float, float>, Enemy*>& p : Enemy::enemies) {
+        p.first.first += (p.first.first == 0) ? 0 : direction;
+
+        if (p.second) {
+            p.second->update(p.first, target);
+
+            for (Projectile& p2 : Projectile::projectiles) {
+                if (p2.ID == 0 && HitBox::Collision(p.second->hitBox, p2.getHitBox())) {
+                    p.second->health--;
+                    p2.del = true;
+
+                    if (p.second->health > 0) {
+                        PlaySound(SoundManager::hit);
                     }
 
                     if (p.second->health <= 0) {
+                        gainedScore += p.second->getScoreValue();
+                        PlaySound(SoundManager::dead);
+
                         Animation::animations.push_back(
-                            Animation(p.second->position.first, p.second->position.second, 155, 0, 33, 33, 30, 30, 4, ImageManager::SpriteSheet)
+                            Animation(
+                                p.second->position.first,
+                                p.second->position.second,
+                                155, 0, 33, 33, 30, 30, 4,
+                                ImageManager::SpriteSheet
+                            )
                         );
+
                         p.second = nullptr;
                     }
-                }
-            }
-            
-            for (int i = 0; i < Enemy::enemies.size(); i++) {
-                if ((Enemy::enemies[i].second && Enemy::enemies[i].second->position.first <= -30) || 
-                    (!Enemy::enemies[i].second && Enemy::enemies[i].first.first == 0 && Enemy::enemies[i].first.second == 0)) {
-                    Enemy::enemies.erase(Enemy::enemies.begin() + i);
-                }
-            }
 
-            directionChange++;
-
-            if (directionChange >= 200) {
-                directionChange = 0;
-                direction *= -1;
+                    break;
+                }
             }
         }
+    }
+    
+    for (int i = 0; i < Enemy::enemies.size(); i++) {
+        if ((Enemy::enemies[i].second && Enemy::enemies[i].second->position.first <= -30) ||
+            (!Enemy::enemies[i].second && Enemy::enemies[i].first.first == 0 && Enemy::enemies[i].first.second == 0)) {
+            Enemy::enemies.erase(Enemy::enemies.begin() + i);
+            i--;
+        }
+    }
+
+    directionChange++;
+
+    if (directionChange >= 200) {
+        directionChange = 0;
+        direction *= -1;
+    }
+
+    return gainedScore; }
 };
