@@ -11,8 +11,7 @@ Don't forget that you must also fill out an evaluation form in Moodle to conside
 
 ## Grading
 
-(STUDENT NUMBER HERE) (STUDENT NAME HERE) (STUDENT EMAIL HERE)
-(STUDENT NUMBER HERE) (STUDENT NAME HERE) (STUDENT EMAIL HERE)
+(802-20-5718) (Jeidriel M. Miranda Morales) (jeidriel.miranda@upr.edu)
 
 Any project that doesn't compile will receive a 0.
 
@@ -22,3 +21,4 @@ If a partner has no commits in the repositories, they will receive a 0.
 
 ## Student Notes
 If you have any bonus specs, bonus or any details the TA's should know, you should include it here:
+Professor approved individual work.
